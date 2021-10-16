@@ -14,7 +14,7 @@ import opensea from "./assets/opensea.svg";
 dotenv.config();
 
 // Constants
-const TWITTER_HANDLE = "_buildspace";
+const TWITTER_HANDLE = "anon101";
 const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
@@ -27,6 +27,7 @@ const App = () => {
   const [cHeight, setcHeight] = useState(0);
   const [minted, setMinted] = useState(false);
   const [base64Image, setBase64Image] = useState(null);
+  const [wrongChain, setWrongChain] = useState({});
   const sectionRef = useRef();
 
   const RINKEBY_CONTRACT_ADDRESS =
@@ -46,14 +47,17 @@ const App = () => {
     if (!window.ethereum) {
       console.log("Make sure your Metamask is installed!");
     } else {
-      const accounts = await window.ethereum.request({
-        method: "eth_accounts",
-      });
+      checkChain();
+      if (!wrongChain.value) {
+        const accounts = await window.ethereum.request({
+          method: "eth_accounts",
+        });
 
-      if (accounts.length !== 0) {
-        setCurrentAccount(accounts[0]);
-      } else {
-        console.log("No authorized account found");
+        if (accounts.length !== 0) {
+          setCurrentAccount(accounts[0]);
+        } else {
+          console.log("No authorized account found");
+        }
       }
     }
   };
@@ -65,20 +69,33 @@ const App = () => {
         alert("Get Metamask!");
         return;
       }
+      checkChain();
+      if (!wrongChain.value) {
+        const accounts = await ethereum.request({
+          method: "eth_requestAccounts",
+        });
 
-      const accounts = await ethereum.request({
-        method: "eth_requestAccounts",
-      });
-
-      console.log("Connected with account: ", accounts[0]);
-      setCurrentAccount(accounts[0]);
+        console.log("Connected with account: ", accounts[0]);
+        setCurrentAccount(accounts[0]);
+      }
     } catch (error) {
       console.log(error);
     }
   };
 
+  const checkChain = async () => {
+    const { ethereum } = window;
+    let chainId = await ethereum.request({ method: "eth_chainId" });
+    const rinkebyChainId = "0x4";
+    if (chainId !== rinkebyChainId) {
+      setWrongChain({ value: true, msg: "Wrong Network!" });
+    } else {
+      setWrongChain({ value: false, msg: "" });
+    }
+  };
+
   useEffect(() => {
-    if (currentAccount) {
+    if (currentAccount && !wrongChain.value) {
       setUpListeners();
     }
   }, [currentAccount]);
@@ -142,6 +159,7 @@ const App = () => {
       /** Mint */
       const nftTxn = await contractInstance.makeRariNFT();
       setLoading(true);
+      setBase64Image(null);
       await nftTxn.wait();
       setLoading(false);
       setMinted(true);
@@ -153,8 +171,7 @@ const App = () => {
 
   const openOpenOceanlink = () => {
     const url = ` https://testnets.opensea.io/assets/${RINKEBY_CONTRACT_ADDRESS}/${tokenId.toNumber()}`;
-    console.log(url);
-    window.open(url, "_blank");
+    if (!loading) window.open(url, "_blank");
   };
 
   useEffect(() => {
@@ -174,10 +191,15 @@ const App = () => {
           <p className="sub-text">
             Each NFT has a unique name. Discover your NFT today.
           </p>
+          {currentAccount && (
+            <div className="accounts">
+              {wrongChain.value ? wrongChain.msg : currentAccount}
+            </div>
+          )}
         </div>
         <div className="content-container">
           {loading ? (
-            <Loader className="loader" />
+            <Loader className="loader" type="TailSpin" />
           ) : (
             <NftImage
               placeholder={placeholder}
@@ -192,7 +214,7 @@ const App = () => {
             <button
               onClick={mintNFT}
               className="cta-button connect-wallet-button"
-              disabled={loading}
+              disabled={loading || wrongChain.value}
             >
               {loading ? "Minting ... " : "Mint NFT"}
             </button>
@@ -209,10 +231,10 @@ const App = () => {
           <img alt="Twitter Logo" className="twitter-logo" src={twitterLogo} />
           <a
             className="footer-text"
-            href={TWITTER_LINK}
+            // href={TWITTER_LINK}
             target="_blank"
             rel="noreferrer"
-          >{`built on @${TWITTER_HANDLE}`}</a>
+          >{`built by @${TWITTER_HANDLE}`}</a>
         </div>
       </div>
     </div>
