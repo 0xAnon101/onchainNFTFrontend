@@ -120,7 +120,7 @@ const App = () => {
   };
 
   // gets you the contract instance to work with
-  const getContractInstance = (ethereum) => {
+  const getContractInstance = async (ethereum) => {
     const provider = await new ethers.providers.Web3Provider(ethereum);
     const signer = await provider.getSigner();
     const contractInstance = new ethers.Contract(
