@@ -120,7 +120,7 @@ const App = () => {
   };
 
   // gets you the contract instance to work with
-  const getContractInstance = () => {
+  const getContractInstance = (ethereum) => {
     const provider = await new ethers.providers.Web3Provider(ethereum);
     const signer = await provider.getSigner();
     const contractInstance = new ethers.Contract(
@@ -137,7 +137,7 @@ const App = () => {
       const { ethereum } = window;
       if (ethereum) {
         /** Get Contract instance */
-        const { contractInstance } = getContractInstance();
+        const { contractInstance } = getContractInstance(ethereum);
 
         /** Fetch the NFT minted by user and total NFT minted so fat */
         fetchNFTNumbers(contractInstance);
@@ -167,7 +167,7 @@ const App = () => {
       console.log("Ethereum object doesn't exist!");
     } else {
       /** Get Contract instance */
-      const { contractInstance } = getContractInstance();
+      const { contractInstance } = getContractInstance(ethereum);
 
       /** Mint */
       const nftTxn = await contractInstance.makeRariNFT();
