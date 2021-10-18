@@ -33,6 +33,20 @@ const App = () => {
   const RINKEBY_CONTRACT_ADDRESS =
     process.env.REACT_APP_RINKEBY_CONTRACT_ADDRESS;
 
+  useEffect(() => {
+    if (currentAccount && !wrongChain.value) {
+      setUpListeners();
+    }
+  }, [currentAccount]);
+
+  useEffect(() => {
+    checkIfWalletIsConnected();
+    const sectionEl = sectionRef.current;
+    console.log(sectionEl);
+    setcWidth(sectionEl.offsetWidth);
+    setcHeight(sectionEl.offsetHeight);
+  }, []);
+
   // Render Methods
   const renderNotConnectedContainer = () => (
     <button
@@ -43,6 +57,7 @@ const App = () => {
     </button>
   );
 
+  // checks wallet on first load
   const checkIfWalletIsConnected = async () => {
     if (!window.ethereum) {
       console.log("Make sure your Metamask is installed!");
@@ -62,6 +77,7 @@ const App = () => {
     }
   };
 
+  // connects wallet on btn click
   const connectWallet = async () => {
     try {
       const { ethereum } = window;
@@ -83,6 +99,15 @@ const App = () => {
     }
   };
 
+  // fetch and populate NFT data
+  const fetchNFTNumbers = async (contractInstance) => {
+    const getTotalNFTMinted = await contractInstance.getTotalNFTMintedSoFar();
+    const getUserNFTCount = await contractInstance.getUserNFTMintedSoFar();
+    setUserMintedNFT(getUserNFTCount.toNumber());
+    setTotalNFT(getTotalNFTMinted.toNumber());
+  };
+
+  // check for the chainID
   const checkChain = async () => {
     const { ethereum } = window;
     let chainId = await ethereum.request({ method: "eth_chainId" });
@@ -94,17 +119,17 @@ const App = () => {
     }
   };
 
-  useEffect(() => {
-    if (currentAccount && !wrongChain.value) {
-      setUpListeners();
-    }
-  }, [currentAccount]);
+  // gets you the contract instance to work with
+  const getContractInstance = () => {
+    const provider = await new ethers.providers.Web3Provider(ethereum);
+    const signer = await provider.getSigner();
+    const contractInstance = new ethers.Contract(
+      RINKEBY_CONTRACT_ADDRESS,
+      RariNFT.abi,
+      signer
+    );
 
-  const fetchNFTNumbers = async (contractInstance) => {
-    const getTotalNFTMinted = await contractInstance.getTotalNFTMintedSoFar();
-    const getUserNFTCount = await contractInstance.getUserNFTMintedSoFar();
-    setUserMintedNFT(getUserNFTCount.toNumber());
-    setTotalNFT(getTotalNFTMinted.toNumber());
+    return { provider, signer, contractInstance };
   };
 
   const setUpListeners = async () => {
@@ -112,14 +137,7 @@ const App = () => {
       const { ethereum } = window;
       if (ethereum) {
         /** Get Contract instance */
-
-        const provider = await new ethers.providers.Web3Provider(ethereum);
-        const signer = await provider.getSigner();
-        const contractInstance = new ethers.Contract(
-          RINKEBY_CONTRACT_ADDRESS,
-          RariNFT.abi,
-          signer
-        );
+        const { contractInstance } = getContractInstance();
 
         /** Fetch the NFT minted by user and total NFT minted so fat */
         fetchNFTNumbers(contractInstance);
@@ -148,13 +166,8 @@ const App = () => {
     if (!ethereum) {
       console.log("Ethereum object doesn't exist!");
     } else {
-      const provider = await new ethers.providers.Web3Provider(ethereum);
-      const signer = provider.getSigner();
-      const contractInstance = new ethers.Contract(
-        RINKEBY_CONTRACT_ADDRESS,
-        RariNFT.abi,
-        signer
-      );
+      /** Get Contract instance */
+      const { contractInstance } = getContractInstance();
 
       /** Mint */
       const nftTxn = await contractInstance.makeRariNFT();
@@ -173,14 +186,6 @@ const App = () => {
     const url = ` https://testnets.opensea.io/assets/${RINKEBY_CONTRACT_ADDRESS}/${tokenId.toNumber()}`;
     if (!loading) window.open(url, "_blank");
   };
-
-  useEffect(() => {
-    checkIfWalletIsConnected();
-    const sectionEl = sectionRef.current;
-    console.log(sectionEl);
-    setcWidth(sectionEl.offsetWidth);
-    setcHeight(sectionEl.offsetHeight);
-  }, []);
 
   return (
     <div className="App">
