@@ -15,7 +15,6 @@ dotenv.config();
 
 // Constants
 const TWITTER_HANDLE = "anon101";
-const TWITTER_LINK = `https://twitter.com/${TWITTER_HANDLE}`;
 
 const App = () => {
   const [currentAccount, setCurrentAccount] = useState(null);
@@ -111,7 +110,7 @@ const App = () => {
   const checkChain = async () => {
     const { ethereum } = window;
     let chainId = await ethereum.request({ method: "eth_chainId" });
-    const rinkebyChainId = "0x4";
+    const rinkebyChainId = "0x4"; // for rinkeby
     if (chainId !== rinkebyChainId) {
       setWrongChain({ value: true, msg: "Wrong Network!" });
     } else {
@@ -151,6 +150,7 @@ const App = () => {
             "data:application/json;base64,"
           )[1];
           const { image } = JSON.parse(window.atob(base64String));
+          console.log(image);
           setBase64Image(image);
         });
       } else {
