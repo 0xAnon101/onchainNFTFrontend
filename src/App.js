@@ -41,7 +41,6 @@ const App = () => {
   useEffect(() => {
     checkIfWalletIsConnected();
     const sectionEl = sectionRef.current;
-    console.log(sectionEl);
     setcWidth(sectionEl.offsetWidth);
     setcHeight(sectionEl.offsetHeight);
   }, []);
@@ -136,23 +135,27 @@ const App = () => {
       const { ethereum } = window;
       if (ethereum) {
         /** Get Contract instance */
-        const { contractInstance } = getContractInstance(ethereum);
+        const { contractInstance } = await getContractInstance(ethereum);
 
-        /** Fetch the NFT minted by user and total NFT minted so fat */
-        fetchNFTNumbers(contractInstance);
+        if (contractInstance) {
+          /** Fetch the NFT minted by user and total NFT minted so fat */
+          fetchNFTNumbers(contractInstance);
 
-        /** Set up listener */
-        contractInstance.on("NewRareNFTMinted", async (from, tokenId) => {
-          console.log(tokenId);
-          setTokenId(tokenId);
-          const getBase64MintedSvg = await contractInstance._tokenURI(tokenId);
-          const base64String = getBase64MintedSvg.split(
-            "data:application/json;base64,"
-          )[1];
-          const { image } = JSON.parse(window.atob(base64String));
-          console.log(image);
-          setBase64Image(image);
-        });
+          /** Set up listener */
+          contractInstance.on("NewRareNFTMinted", async (from, tokenId) => {
+            console.log(tokenId);
+            setTokenId(tokenId);
+            const getBase64MintedSvg = await contractInstance._tokenURI(
+              tokenId
+            );
+            const base64String = getBase64MintedSvg.split(
+              "data:application/json;base64,"
+            )[1];
+            const { image } = JSON.parse(window.atob(base64String));
+            console.log(image);
+            setBase64Image(image);
+          });
+        }
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -167,18 +170,21 @@ const App = () => {
       console.log("Ethereum object doesn't exist!");
     } else {
       /** Get Contract instance */
-      const { contractInstance } = getContractInstance(ethereum);
+      const { contractInstance } = await getContractInstance(ethereum);
 
-      /** Mint */
-      const nftTxn = await contractInstance.makeRariNFT();
-      setLoading(true);
-      setBase64Image(null);
-      await nftTxn.wait();
-      setLoading(false);
-      setMinted(true);
+      if (contractInstance) {
+        /** Mint */
+        const nftTxn = await contractInstance.makeRariNFT();
 
-      /** Fetch the NFT minted by user and total NFT minted so fat */
-      fetchNFTNumbers(contractInstance);
+        setLoading(true);
+        setBase64Image(null);
+        await nftTxn.wait();
+        setLoading(false);
+        setMinted(true);
+
+        /** Fetch the NFT minted by user and total NFT minted so fat */
+        fetchNFTNumbers(contractInstance);
+      }
     }
   };
 
