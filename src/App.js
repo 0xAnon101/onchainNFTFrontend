@@ -29,8 +29,7 @@ const App = () => {
   const [wrongChain, setWrongChain] = useState({});
   const sectionRef = useRef();
 
-  const RINKEBY_CONTRACT_ADDRESS =
-    process.env.REACT_APP_RINKEBY_CONTRACT_ADDRESS;
+  const GOERLI_CONTRACT_ADDRESS = process.env.REACT_APP_GOERLI_CONTRACT_ADDRESS;
 
   useEffect(() => {
     if (currentAccount && !wrongChain.value) {
@@ -109,8 +108,8 @@ const App = () => {
   const checkChain = async () => {
     const { ethereum } = window;
     let chainId = await ethereum.request({ method: "eth_chainId" });
-    const rinkebyChainId = "0x4"; // for rinkeby
-    if (chainId !== rinkebyChainId) {
+    const GOERLIChainId = "0x5"; // for GOERLI
+    if (chainId !== GOERLIChainId) {
       setWrongChain({ value: true, msg: "Wrong Network!" });
     } else {
       setWrongChain({ value: false, msg: "" });
@@ -122,7 +121,7 @@ const App = () => {
     const provider = await new ethers.providers.Web3Provider(ethereum);
     const signer = await provider.getSigner();
     const contractInstance = new ethers.Contract(
-      RINKEBY_CONTRACT_ADDRESS,
+      GOERLI_CONTRACT_ADDRESS,
       RariNFT.abi,
       signer
     );
@@ -189,7 +188,7 @@ const App = () => {
   };
 
   const openOpenOceanlink = () => {
-    const url = ` https://testnets.opensea.io/assets/${RINKEBY_CONTRACT_ADDRESS}/${tokenId.toNumber()}`;
+    const url = ` https://testnets.opensea.io/assets/${GOERLI_CONTRACT_ADDRESS}/${tokenId.toNumber()}`;
     if (!loading) window.open(url, "_blank");
   };
 

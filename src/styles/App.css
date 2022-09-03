@@ -19,6 +19,31 @@
   font-weight: 300;
   position: relative;
 }
+.header {
+  margin: 0;
+  font-size: 50px;
+  font-weight: bold;
+}
+
+.sub-text {
+  font-size: 25px;
+  color: white;
+  margin: 0 auto;
+}
+
+.gradient-text {
+  background: -webkit-linear-gradient(left, #60c657 30%, #35aee2 60%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.connect-wallet-button {
+  background: -webkit-linear-gradient(left, #60c657, #35aee2);
+  background-size: 200% 200%;
+  animation: gradient-animation 4s ease infinite;
+  margin-top: 20px;
+}
+
 .content-container {
   font-family: "Montserrat", sans-serif;
   font-weight: 300;
@@ -38,12 +63,6 @@
   border-radius: 5px;
   cursor: pointer;
   font-weight: 400;
-}
-
-.header {
-  margin: 0;
-  font-size: 50px;
-  font-weight: bold;
 }
 
 .planet-2 {
@@ -94,19 +113,6 @@
   }
 }
 
-.sub-text {
-  font-size: 25px;
-  color: white;
-  margin: 0 auto;
-}
-
-.gradient-text {
-  background: -webkit-linear-gradient(left, #60c657 30%, #35aee2 60%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 .cta-button {
   height: 45px;
   border: 0;
@@ -120,13 +126,6 @@
   color: white;
   font-family: "Montserrat", sans-serif;
   font-weight: 500;
-}
-
-.connect-wallet-button {
-  background: -webkit-linear-gradient(left, #60c657, #35aee2);
-  background-size: 200% 200%;
-  animation: gradient-animation 4s ease infinite;
-  margin-top: 20px;
 }
 
 .opensea-btn {
