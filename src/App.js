@@ -188,7 +188,7 @@ const App = () => {
   };
 
   const openOpenOceanlink = () => {
-    const url = ` https://testnets.opensea.io/assets/${GOERLI_CONTRACT_ADDRESS}/${tokenId.toNumber()}`;
+    const url = ` https://testnets.opensea.io/assets/goerli/${GOERLI_CONTRACT_ADDRESS}/${tokenId.toNumber()}`;
     if (!loading) window.open(url, "_blank");
   };
 
